@@ -23,7 +23,7 @@ defmodule NervesLivebook.WiFiMonitor do
   @presence_prop ["interface", "wlan0", "present"]
   @connection_prop ["interface", "wlan0", "connection"]
   @connected_status [:lan, :internet]
-  @default_timeout 3 * 60 * 1000
+  @default_timeout 10 * 1000
 
   @spec start_link(Keyword.t()) :: GenServer.on_start()
   def start_link(opts \\ []), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)

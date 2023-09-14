@@ -50,7 +50,7 @@ defmodule NervesLivebook.Application do
         passphrase = kv["wifi_passphrase"]
 
         unless empty?(ssid) do
-          _ = VintageNetWiFi.quick_configure(ssid, passphrase)
+          #_ = VintageNetWiFi.quick_configure(ssid, passphrase)
           :ok
         end
       end
@@ -76,6 +76,6 @@ defmodule NervesLivebook.Application do
     defp target_children(_), do: []
   else
     defp target_children(:srhub), do: [NervesLivebook.WiFiMonitor]
-    defp target_children(_), do: []
+    defp target_children(_), do: [NervesLivebook.WiFiMonitor]
   end
 end
