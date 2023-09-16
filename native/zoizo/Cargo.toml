@@ -1,0 +1,15 @@
+[package]
+name = "zoizo"
+version = "0.1.0"
+authors = []
+edition = "2021"
+
+[lib]
+name = "zoizo"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.29.1"
+image = "0.23.14"
+imageproc = "0.22.0"

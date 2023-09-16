@@ -76,6 +76,6 @@ defmodule NervesLivebook.Application do
     defp target_children(_), do: []
   else
     defp target_children(:srhub), do: [NervesLivebook.WiFiMonitor]
-    defp target_children(_), do: [NervesLivebook.WiFiMonitor]
+    defp target_children(_), do: [NervesLivebook.WiFiMonitor, NervesLivebook.Ttys0]
   end
 end
