@@ -119,7 +119,7 @@ defmodule NervesLivebook.MixProject do
       {:vega_lite, "~> 0.1"},
       {:rustler, "0.29.1"},
 
-      {:mqscope, path: "/Users/lucas/mqscope", runtime: false, targets: :mqscope},
+      {:mqscope, path: "/Users/lucas/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope},
 
 
       # Compile-time only

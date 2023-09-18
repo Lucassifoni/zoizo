@@ -16,7 +16,9 @@ defmodule NervesLivebook.Application do
 
     children =
       [
-        NervesLivebook.UI
+        NervesLivebook.UI,
+        NervesLivebook.PhysicalRemote.Handler,
+        NervesLivebook.PhysicalRemote.Serial,
       ] ++ target_children(Nerves.Runtime.mix_target())
 
     Supervisor.start_link(children, opts)
@@ -73,9 +75,9 @@ defmodule NervesLivebook.Application do
   end
 
   if Mix.target() == :host do
-    defp target_children(_), do: []
+    defp target_children(_), do: [NervesLivebook.Ttys0]
   else
     defp target_children(:srhub), do: [NervesLivebook.WiFiMonitor]
-    defp target_children(_), do: [NervesLivebook.WiFiMonitor, NervesLivebook.Ttys0]
+    defp target_children(_), do: [NervesLivebook.WiFiMonitor]
   end
 end
