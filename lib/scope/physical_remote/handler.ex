@@ -1,7 +1,7 @@
 defmodule Scope.PhysicalRemote.Handler do
   use Agent
   alias Scope.Controls.Buttons
-  alias Scope.Input.Handler
+  alias Scope.InputHandler
 
   def start_link(_) do
     Agent.start_link(fn () ->
@@ -16,7 +16,7 @@ defmodule Scope.PhysicalRemote.Handler do
     Agent.update(__MODULE__, fn (_) -> new_state end)
     events = Buttons.diff(old_state, new_state)
     for event <- events do
-      Handler.handle(event)
+      InputHandler.handle(event)
     end
     :ok
   end

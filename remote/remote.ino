@@ -19,7 +19,8 @@
 #define FOUT 12   // ok
 #define AF 9      // ok
 #define FIN 7     // ok
-
+#define I_HANDLE_THE_REMOTE 59 // ;
+#define ACK 61 // =
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
@@ -40,6 +41,10 @@ void setup()
   pinMode(FIN, INPUT_PULLUP);
   tft.initR(INITR_144GREENTAB);
   tft.fillScreen(ST7735_BLACK);
+  while (!Serial.available() || Serial.read() != ACK) {
+    Serial.println(I_HANDLE_THE_REMOTE);
+    delay(50);
+  }
 }
 
 #define PIC_WIDTH 100
