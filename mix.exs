@@ -1,13 +1,13 @@
-defmodule NervesLivebook.MixProject do
+defmodule Scope.MixProject do
   use Mix.Project
 
-  @app :nerves_livebook
+  @app :scope
   @version "0.10.1"
-  @source_url "https://github.com/nerves-livebook/nerves_livebook"
+  @source_url "https://github.com/scope/scope"
 
   @all_targets [:mqscope]
   @rust_toolchain "riscv64gc-unknown-linux-gnu"
-  @linker_path Path.expand("~/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-darwin_arm-1.8.0/bin/riscv64-nerves-linux-gnu-gcc")
+  @linker_path Path.expand("~/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-linux_x86_64-1.8.0/bin/riscv64-nerves-linux-gnu-gcc")
 
   # Libraries that use MMAL on the Raspberry Pi won't work with the Raspberry
   # Pi 4. The Raspberry Pi 4 uses DRM and libcamera.
@@ -30,13 +30,13 @@ defmodule NervesLivebook.MixProject do
         System.put_env("RUSTFLAGS", "-C linker=#{@linker_path}")
         System.put_env("RUSTLER_TARGET", @rust_toolchain)
         :ok
-      _ -> System.put_env("RUSTLER_TARGET", "aarch64-apple-darwin")
+      _ -> System.put_env("RUSTLER_TARGET", "x86_64-unknown-linux-gnu")
     end
 
     [
       app: @app,
-      description: "Develop on embedded devices with Livebook and Nerves",
-      author: "https://github.com/nerves-livebook/nerves_livebook/graphs/contributors",
+      description: "Develop on embedded devices with Scope and Nerves",
+      author: "https://github.com/scope/scope/graphs/contributors",
       version: @version,
       package: package(),
       elixir: "~> 1.14",
@@ -57,13 +57,13 @@ defmodule NervesLivebook.MixProject do
 
   def application do
     [
-      mod: {NervesLivebook.Application, []},
+      mod: {Scope.Application, []},
       extra_applications: [:logger, :runtime_tools, :inets, :ex_unit]
     ]
   end
 
   # The nice part about posting to hex is that documentation links work when you're
-  # calling NervesLivebook functions.
+  # calling Scope functions.
   defp package do
     %{
       files: [
@@ -119,7 +119,7 @@ defmodule NervesLivebook.MixProject do
       {:vega_lite, "~> 0.1"},
       {:rustler, "0.29.1"},
 
-      {:mqscope, path: "/Users/lucas/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope},
+      {:mqscope, path: "/home/chantepierre/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope},
 
 
       # Compile-time only

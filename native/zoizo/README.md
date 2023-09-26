@@ -8,7 +8,7 @@
 
 ```elixir
 defmodule Zoizo do
-  use Rustler, otp_app: :nerves_livebook, crate: "zoizo"
+  use Rustler, otp_app: :scope, crate: "zoizo"
 
   # When your NIF is loaded, it will override this function.
   def add(_a, _b), do: :erlang.nif_error(:nif_not_loaded)

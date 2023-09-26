@@ -30,12 +30,12 @@ config :nerves, :erlinit, update_clock: true
 
 config :nerves_ssh,
   daemon_option_overrides: [
-    {:pwdfun, &NervesLivebook.ssh_check_pass/2},
-    {:auth_method_kb_interactive_data, &NervesLivebook.ssh_show_prompt/3}
+    {:pwdfun, &Scope.ssh_check_pass/2},
+    {:auth_method_kb_interactive_data, &Scope.ssh_show_prompt/3}
   ]
 
 config :mdns_lite,
-  instance_name: "Nerves Livebook",
+  instance_name: "Scope",
 
   # Use MdnsLite's DNS bridge feature to support mDNS resolution in Erlang
   dns_bridge_enabled: true,

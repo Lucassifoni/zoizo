@@ -3,7 +3,11 @@ mod parabola;
 use std::fmt::Display;
 
 use dof::DepthAndColorMap;
-use image::ImageError;
+use nokhwa::{
+    pixel_format::RgbFormat,
+    utils::{CameraIndex, CameraInfo, RequestedFormat, RequestedFormatType},
+    Camera,
+};
 use parabola::Segment;
 use rustler::ResourceArc;
 
@@ -16,6 +20,24 @@ pub fn non_parallel_rayfan_coords(
     rays: i32,
 ) -> Vec<Segment> {
     parabola::non_parallel_rayfan_coords(focal_length, radius, source_distance, source_height, rays)
+}
+
+#[rustler::nif]
+pub fn capture() -> () {
+    let index = CameraIndex::Index(0);
+    // request the absolute highest resolution CameraFormat that can be decoded to RGB.
+    let requested =
+        RequestedFormat::new::<RgbFormat>(RequestedFormatType::AbsoluteHighestFrameRate);
+    // make the camera
+    let mut camera = Camera::new(index, requested).unwrap();
+    camera.open_stream().unwrap();
+    // get a frame
+    let frame = camera.frame().unwrap();
+    println!("Captured Single Frame of {}", frame.buffer().len());
+    // decode into an ImageBuffer
+    let decoded = frame.decode_image::<RgbFormat>().unwrap();
+    println!("Decoded Frame of {}", decoded.len());
+    ()
 }
 
 #[rustler::nif]
@@ -96,7 +118,8 @@ rustler::init!(
         reflection_angle,
         load_image,
         blur,
-        blur_diam_px_from_base_fl
+        blur_diam_px_from_base_fl,
+        capture
     ],
     load = load
 );

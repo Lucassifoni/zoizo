@@ -7,17 +7,17 @@ notebook_path =
   if mix_target == :host do
     Path.expand("priv") <> "/"
   else
-    "/data/livebook/"
+    "/data/scope/"
   end
 
 # Set the password to "nerves".
-config :livebook,
+config :scope,
   authentication_mode: :password,
   password: "nerves"
 
 # Set the Erlang distribution cookie
-config :livebook,
-  cookie: :nerves_livebook_cookie
+config :scope,
+  cookie: :scope_cookie
 
 # Endpoint configuration
 port = if mix_target == :host, do: 8080, else: 80
@@ -26,8 +26,8 @@ port = if mix_target == :host, do: 8080, else: 80
 
 # Setup Erlang distribution
 with {_, 0} <- System.cmd("epmd", ["-daemon"]),
-     {:ok, _pid} <- Node.start(:"livebook@#{hostname}.local") do
-  # Livebook always sets the cookie, so let it set it. See the Livebook application config.
+     {:ok, _pid} <- Node.start(:"scope@#{hostname}.local") do
+  # Scope always sets the cookie, so let it set it. See the Scope application config.
   :ok
 end
 
