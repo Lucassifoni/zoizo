@@ -126,10 +126,7 @@ defmodule Scope.MixProject do
       {:stb_image, "~> 0.6.0"},
       {:vega_lite, "~> 0.1"},
       {:rustler, "0.29.1"},
-
-      {:mqscope, path: "/home/chantepierre/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope},
-
-
+      (if System.get_env("MAC_OS"), do: {:mqscope, path: "../mqscope", runtime: false, nerves: [compile: true], targets: :mqscope}, else: {:mqscope, path: "/home/chantepierre/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope}),
       # Compile-time only
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: :dev, runtime: false},
