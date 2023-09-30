@@ -7,7 +7,11 @@ defmodule Scope.MixProject do
 
   @all_targets [:mqscope]
   @rust_toolchain "riscv64gc-unknown-linux-gnu"
-  @linker_path Path.expand("~/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-linux_x86_64-1.8.0/bin/riscv64-nerves-linux-gnu-gcc")
+  @linker_path (if System.get_env("MAC_OS") do
+    Path.expand(".nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-darwin_arm-1.8.0/riscv64-nerves-linux-gnu")
+  else
+    Path.expand("~/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-linux_x86_64-1.8.0/bin/riscv64-nerves-linux-gnu-gcc")
+  end)
 
   # Libraries that use MMAL on the Raspberry Pi won't work with the Raspberry
   # Pi 4. The Raspberry Pi 4 uses DRM and libcamera.
@@ -30,7 +34,11 @@ defmodule Scope.MixProject do
         System.put_env("RUSTFLAGS", "-C linker=#{@linker_path}")
         System.put_env("RUSTLER_TARGET", @rust_toolchain)
         :ok
-      _ -> System.put_env("RUSTLER_TARGET", "x86_64-unknown-linux-gnu")
+      _ -> if System.get_env("MAC_OS") do
+
+      else
+        System.put_env("RUSTLER_TARGET", "x86_64-unknown-linux-gnu")
+      end
     end
 
     [
