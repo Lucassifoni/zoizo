@@ -20,6 +20,7 @@ config :zoizoui, ZoizouiWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Zoizoui.PubSub,
+  live_view: [signing_salt: "VGWxWb2g"],
   secret_key_base: "DYwwesYRFdqHznJDKKnhZtmilBK1HRd4MWhNK9RxMXRTu4je4aAjqtwNjurxYye7"
 
 config :phoenix, :json_library, Jason

@@ -16,6 +16,7 @@ defmodule Scope.InputHandler do
     :left_pressed,
     :left_released
   ] do
+    IO.inspect(event)
     GenServer.cast(SerialMotors, event)
     :ok
   end

@@ -86,4 +86,5 @@ void loop()
   {
     step = 0;
   }
+  delay(2);
 }

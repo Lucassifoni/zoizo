@@ -20,8 +20,8 @@ defmodule Scope.Application do
         Scope.PhysicalRemote.Handler,
         Scope.PhysicalRemote.SerialRemote,
         Scope.Motors.SerialMotors,
-        Scope.SerialServer,
-        Scope.WebuiCommunication
+        Scope.WebuiCommunication,
+        Scope.SerialServer
       ] ++ target_children(Nerves.Runtime.mix_target())
 
     Supervisor.start_link(children, opts)

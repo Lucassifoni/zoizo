@@ -30,6 +30,7 @@ uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
 
 void setup()
 {
+
   Serial.begin(115200);
   pinMode(HAUT, INPUT_PULLUP);
   pinMode(BAS, INPUT_PULLUP);

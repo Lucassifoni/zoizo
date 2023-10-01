@@ -42,6 +42,14 @@ Hooks.FooButton = {
         this.el.addEventListener('mouseup', () => {
             this.pushEvent(this.el.dataset.buttonid + '_released');
         });
+        this.el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.pushEvent(this.el.dataset.buttonid + '_pressed');
+        });
+        this.el.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.pushEvent(this.el.dataset.buttonid + '_released');
+        });
     }
 };
 

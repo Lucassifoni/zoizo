@@ -11,7 +11,7 @@ defmodule Scope.PhysicalRemote.SerialRemote do
 
   @impl true
   def handle_info({:register_port, pid}, _) do
-    Logger.info("Registering serial port for the remote control")
+    IO.inspect("Registering serial port for the remote control")
     {:noreply, pid}
   end
   def handle_info({:circuits_uart, _, "%"}, b), do: {:noreply, b}

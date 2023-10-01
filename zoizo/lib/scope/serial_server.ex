@@ -11,7 +11,7 @@ defmodule Scope.SerialServer do
 
   def start_link(arg) do
     {:ok, pid} = GenServer.start_link(__MODULE__, arg, name: __MODULE__)
-    devices = SerialUtils.find_devices()
+    devices = SerialUtils.find_devices() |> IO.inspect()
     SerialUtils.open_devices(devices, pid)
     {:ok, pid}
   end
@@ -21,6 +21,7 @@ defmodule Scope.SerialServer do
   end
 
   def handle_info({:port_to_pid, device, pid}, state) do
+    IO.inspect("Port to pid")
     {:noreply, Map.put(state, device, {pid, :untransfered})}
   end
 
@@ -33,6 +34,7 @@ defmodule Scope.SerialServer do
   end
 
   def handle_info(msg, state) do
+
     {:noreply, state}
   end
 
