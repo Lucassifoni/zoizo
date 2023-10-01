@@ -99,7 +99,7 @@ defmodule Scope.MixProject do
       {:nerves_runtime, "~> 0.13.0"},
       {:plug, "~> 1.12"},
       {:vintage_net, "~> 0.13"},
-      {:zoizoui, path: "../zoizoui", targets: @all_targets, env: Mix.env()}
+      {:zoizoui, path: "../zoizoui", targets: @all_targets ++ [:host], env: Mix.env()},
 
       # Pull in commonly used libraries as a convenience to users.
       {:bmp280, "~> 0.2", targets: @all_targets},
@@ -127,7 +127,7 @@ defmodule Scope.MixProject do
       {:stb_image, "~> 0.6.0"},
       {:vega_lite, "~> 0.1"},
       {:rustler, "0.29.1"},
-      (if System.get_env("MAC_OS"), do: {:mqscope, path: "../mqscope", runtime: false, nerves: [compile: true], targets: :mqscope}, else: {:mqscope, path: "/home/chantepierre/mqscope", runtime: false, nerves: [compile: true], targets: :mqscope}),
+      {:mqscope, path: "../mqscope", runtime: false, nerves: [compile: true], targets: :mqscope},
       # Compile-time only
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3", only: :dev, runtime: false},

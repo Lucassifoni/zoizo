@@ -73,6 +73,7 @@ defmodule Scope.Motors.SerialMotors do
     {:noreply, %{pid: pid, states: new_state}}
   end
 
+  def write(nil, _), do: :ok
   def write(pid, %{
         enableAZ: b8,
         enableALT: b7,

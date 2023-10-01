@@ -18,6 +18,7 @@ defmodule ZoizouiWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/ui", ControlsLive
   end
 
   # Other scopes may use custom stacks.

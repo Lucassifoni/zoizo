@@ -6,6 +6,26 @@ import Config
 
 config :shoehorn, init: [:nerves_runtime, :nerves_pack]
 
+config :zoizoui, ZoizouiWeb.Endpoint,
+  # Binding to loopback ipv4 address prevents access from other machines.
+  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+  http: [port: 80],
+  server: true,
+  url: [host: "nerves.local"],
+  check_origin: false,
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  code_reloader: false,
+  render_errors: [
+    formats: [html: ZoizouiWeb.ErrorHTML, json: ZoizouiWeb.ErrorJSON],
+    layout: false
+  ],
+  pubsub_server: Zoizoui.PubSub,
+  secret_key_base: "DYwwesYRFdqHznJDKKnhZtmilBK1HRd4MWhNK9RxMXRTu4je4aAjqtwNjurxYye7"
+
+config :phoenix, :json_library, Jason
+
+config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Zoizoui.Finch
+
 # Use Ringlogger as the logger backend and remove :console.
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
 # configuring ring_logger.
