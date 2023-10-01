@@ -3,11 +3,11 @@ mod parabola;
 use std::fmt::Display;
 
 use dof::DepthAndColorMap;
-use nokhwa::{
+/*use nokhwa::{
     pixel_format::RgbFormat,
     utils::{CameraIndex, CameraInfo, RequestedFormat, RequestedFormatType},
     Camera,
-};
+};*/
 use parabola::Segment;
 use rustler::ResourceArc;
 
@@ -21,7 +21,7 @@ pub fn non_parallel_rayfan_coords(
 ) -> Vec<Segment> {
     parabola::non_parallel_rayfan_coords(focal_length, radius, source_distance, source_height, rays)
 }
-
+/*
 #[rustler::nif]
 pub fn capture() -> () {
     let index = CameraIndex::Index(0);
@@ -39,6 +39,7 @@ pub fn capture() -> () {
     println!("Decoded Frame of {}", decoded.len());
     ()
 }
+*/
 
 #[rustler::nif]
 pub fn reflection_angle(
@@ -119,7 +120,7 @@ rustler::init!(
         load_image,
         blur,
         blur_diam_px_from_base_fl,
-        capture
+        //capture
     ],
     load = load
 );

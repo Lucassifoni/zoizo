@@ -8,7 +8,7 @@ defmodule Scope.MixProject do
   @all_targets [:mqscope]
   @rust_toolchain "riscv64gc-unknown-linux-gnu"
   @linker_path (if System.get_env("MAC_OS") do
-    Path.expand(".nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-darwin_arm-1.8.0/riscv64-nerves-linux-gnu")
+    Path.expand("/Users/lucas/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-darwin_arm-1.8.0/riscv64-nerves-linux-gnu")
   else
     Path.expand("~/.nerves/artifacts/nerves_toolchain_riscv64_nerves_linux_gnu-linux_x86_64-1.8.0/bin/riscv64-nerves-linux-gnu-gcc")
   end)
