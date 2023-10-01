@@ -1,7 +1,7 @@
 defmodule Zoizo do
   @moduledoc false
 
-  #use Rustler, otp_app: :scope, crate: "zoizo", target: System.get_env("RUSTLER_TARGET")
+  use Rustler, otp_app: :scope, crate: "zoizo", target: System.get_env("RUSTLER_TARGET")
 
   def non_parallel_rayfan_coords(_focal_length, _radius, _source_distance, _source_height, _rays),
     do: error()

@@ -5,7 +5,7 @@ defmodule Scope.WebuiCommunication do
 
   def start_link(_opts) do
     {:ok, pid} = GenServer.start_link(__MODULE__, nil, name: Scope.WebuiCommunication)
-  Process.send(pid, :subscribe, [])
+    Process.send(pid, :subscribe, [])
     {:ok, pid}
   end
 

@@ -1,6 +1,4 @@
 defmodule Scope.PhysicalRemote.SerialRemote do
-  alias Scope.PhysicalRemote.SerialRemote
-  alias Scope.PhysicalRemote.Screen
   alias Scope.PhysicalRemote.Handler
   require Logger
   use GenServer
@@ -50,11 +48,6 @@ defmodule Scope.PhysicalRemote.SerialRemote do
     :ok
   end
   def loop_on_pic_data([], _pid), do: :ok
-
-  def write_image(pid) do
-    send(pid, {:picture, Screen.sample_picture() })
-    :ok
-  end
 
   def clear(pid) do
     send(pid, :erase_screen)

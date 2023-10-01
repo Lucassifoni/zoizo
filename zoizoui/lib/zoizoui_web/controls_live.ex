@@ -1,9 +1,11 @@
 defmodule ZoizouiWeb.ControlsLive do
+  alias Phoenix.PubSub
   # In Phoenix apps, the line is typically: use MyAppWeb, :live_view
   use Phoenix.LiveView
 
   def render(assigns) do
     ~H"""
+    <canvas id="canvas" style="width:100%;height:auto"></canvas>
     <button class="bg-red-500 p-4" phx-hook="FooButton" data-buttonid="left" id="foobutton-left">gauche</button>
     <button class="bg-red-500 p-4" phx-hook="FooButton" data-buttonid="right" id="foobutton-right">droite</button>
     <button class="bg-red-500 p-4" phx-hook="FooButton" data-buttonid="up" id="foobutton-up">haut</button>
@@ -14,7 +16,14 @@ defmodule ZoizouiWeb.ControlsLive do
   end
 
   def mount(_params, %{}, socket) do
+    PubSub.subscribe(Zoizoui.PubSub, "frames")
     {:ok, socket}
+  end
+
+  def handle_info({:got_pic, pic}, socket) do
+    {:noreply, push_event(socket, "js-frame", %{
+      frameData: pic,
+    })}
   end
 
   @button_events [

@@ -21,7 +21,8 @@ defmodule Scope.Application do
         Scope.PhysicalRemote.SerialRemote,
         Scope.Motors.SerialMotors,
         Scope.WebuiCommunication,
-        Scope.SerialServer
+        Scope.SerialServer,
+        Scope.WebcamServer
       ] ++ target_children(Nerves.Runtime.mix_target())
 
     Supervisor.start_link(children, opts)

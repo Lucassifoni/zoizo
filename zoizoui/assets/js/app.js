@@ -61,3 +61,33 @@ liveSocket.connect()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
+
+function draw2(imgData) {
+    "use strict";
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var uInt8Array = new Uint8Array(imgData);
+    var i = uInt8Array.length;
+    var binaryString = [i];
+    while (i--) {
+        binaryString[i] = String.fromCharCode(uInt8Array[i]);
+    }
+    var data = binaryString.join('');
+
+    var base64 = window.btoa(data);
+    var img = new Image();
+    img.src = "data:image/jpeg;base64," + base64;
+    img.onload = function () {
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0,0, canvas.width, canvas.height);
+    };
+    img.onerror = function (stuff) {
+        console.log("Img Onerror:", stuff);
+    };
+
+}
+
+window.addEventListener("phx:js-frame", ({detail}) => {
+    draw2(detail.frameData);
+});
