@@ -1,7 +1,7 @@
 defmodule Scope.Capture do
   @moduledoc false
 
-  use Rustler, otp_app: :scope, crate: "capture", target: System.get_env("RUSTLER_TARGET")
+  use Rustler, otp_app: :scope, crate: "capt", target: System.get_env("RUSTLER_TARGET")
 
   def do_capture() do
     case capture() do

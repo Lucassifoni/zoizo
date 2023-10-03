@@ -74,7 +74,7 @@ void loop()
   }
   if (enableFOCUS)
   {
-    digitalWrite(FOCUSdirPin, dirAZ);
+    digitalWrite(FOCUSdirPin, dirFOCUS);
     digitalWrite(FOCUSstepPin, (step & 0b00000010) >> 1);
   }
   if (enableALT)
