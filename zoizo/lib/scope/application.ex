@@ -34,7 +34,6 @@ defmodule Scope.Application do
 
     # Best effort create everything
     _ = File.mkdir_p(destination_dir)
-    Enum.each(["welcome.livemd", "samples"], &symlink(source_dir, destination_dir, &1))
   end
 
   defp symlink(source_dir, destination_dir, filename) do
@@ -56,7 +55,7 @@ defmodule Scope.Application do
         passphrase = kv["wifi_passphrase"]
 
         unless empty?(ssid) do
-          #_ = VintageNetWiFi.quick_configure(ssid, passphrase)
+          _ = VintageNetWiFi.quick_configure(ssid, passphrase)
           :ok
         end
       end

@@ -22,7 +22,7 @@ defmodule Scope.WebcamServer do
   def handle_info(:do_capture, {_, p}) do
     pid = self()
     Task.start(fn () ->
-      case Zoizo.do_capture() do
+      case Scope.Capture.do_capture() do
         :error ->
           Process.send(pid, {:capture_done, nil}, [])
           :ok

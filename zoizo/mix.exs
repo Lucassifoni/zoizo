@@ -2,7 +2,7 @@ defmodule Scope.MixProject do
   use Mix.Project
 
   @app :scope
-  @version "0.10.1"
+  @version "0.10.2"
   @source_url "https://github.com/scope/scope"
 
   @all_targets [:mqscope]

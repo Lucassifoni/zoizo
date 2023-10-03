@@ -1,0 +1,20 @@
+[package]
+name = "capture"
+version = "0.2.0"
+authors = []
+edition = "2021"
+
+[lib]
+name = "capture"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.29.1"
+image = "0.24.7"
+imageproc = "0.22.0"
+
+[dependencies.nokhwa]
+path = "../../../nokhwa"
+version = "0.10.0"
+features = ["input-native"]
