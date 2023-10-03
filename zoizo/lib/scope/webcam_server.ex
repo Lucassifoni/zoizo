@@ -20,7 +20,7 @@ defmodule Scope.WebcamServer do
   def handle_info(:do_capture, {_, p}) do
     pid = self()
     Task.start(fn () ->
-      pic = Zoizo.capture()
+      {pic, _} = Zoizo.capture()
       PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, pic})
       Process.send(pid, {:capture_done, pic}, [])
     end)

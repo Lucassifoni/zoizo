@@ -10,7 +10,7 @@ defmodule Scope.PhysicalRemote.SerialRemote do
   @impl true
   def handle_info({:register_port, pid}, _) do
     IO.inspect("Registering serial port for the remote control")
-    {:noreply, pid}
+    {:noreply, {pid, :idle}}
   end
   def handle_info({:circuits_uart, _, "%"}, b), do: {:noreply, b}
   def handle_info({:circuits_uart, _, "." <> rest}, b) do
@@ -22,36 +22,34 @@ defmodule Scope.PhysicalRemote.SerialRemote do
     {:noreply, b}
   end
   def handle_info({:circuits_uart, _, _}, b), do: {:noreply, b}
-  def handle_info({:picture, data}, pid) do
+  def handle_info({:picture, data}, {pid, :idle}) do
     erase_screen(pid)
     loop_on_pic_data(data |> Enum.chunk_every(24), pid)
-    {:noreply, pid}
+    {:noreply, {pid, :active}}
   end
-  def handle_info({:loop_on_pic_data, data}, pid) do
-    loop_on_pic_data(data, pid)
-    {:noreply, pid}
+  def handle_info({:loop_on_pic_data, data}, {pid, :active}) do
+    new_state = loop_on_pic_data(data, pid)
+    {:noreply, {pid, new_state}}
   end
-  def handle_info(:erase_screen, pid) do
+  def handle_info(:erase_screen, {pid, :idle}), do:
     erase_screen(pid)
+    {:pid, idle}
   end
 
   def erase_screen(pid) do
     Circuits.UART.write(pid, [?+])
     Circuits.UART.drain(pid)
-    {:noreply, pid}
   end
 
   def loop_on_pic_data([a | b], pid) do
     Circuits.UART.write(pid, a)
     Circuits.UART.drain(pid)
     Process.send_after(self(), {:loop_on_pic_data, b}, 50)
-    :ok
+    :active
   end
-  def loop_on_pic_data([], _pid), do: :ok
+  def loop_on_pic_data([], _pid), do: :idle
 
-  def clear(pid) do
-    send(pid, :erase_screen)
-  end
+  def clear(pid), do: send(pid, :erase_screen)
 
   @impl GenServer
   def init(init_arg) do
