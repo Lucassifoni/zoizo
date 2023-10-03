@@ -43,7 +43,9 @@ void setup()
   tft.initR(INITR_144GREENTAB);
   tft.fillScreen(ST7735_BLACK);
   while (!Serial.available() || Serial.read() != ACK) {
-    Serial.println(I_HANDLE_THE_REMOTE);
+    Serial.write(I_HANDLE_THE_REMOTE);
+    Serial.write(13);
+       Serial.write(10);
     delay(50);
   }
 }
@@ -67,7 +69,6 @@ int maybeDraw()
       while (Serial.available()) {
           int v = Serial.read();
           if (v == ERASE) {
-            tft.fillScreen(ST7735_BLACK);
             x = 0;
             y = 0;
             continue;

@@ -2,12 +2,12 @@ mod parabola;
 use std::fmt::Display;
 
 use std::io::Cursor;
-use image::{ImageBuffer, imageops::{crop, resize, dither, BiLevel, ColorMap, grayscale}, Luma};
+use image::{ImageBuffer, imageops::{crop, resize, dither, BiLevel, ColorMap, grayscale, index_colors}, Luma};
 use imageproc::gray_image;
 use nokhwa::{
     pixel_format::RgbFormat,
     utils::{CameraIndex, CameraInfo, RequestedFormat, RequestedFormatType},
-    Camera,
+    Camera, NokhwaError,
 };
 use parabola::Segment;
 use rustler::ResourceArc;
@@ -26,42 +26,23 @@ pub fn non_parallel_rayfan_coords(
 
 #[rustler::nif(schedule = "DirtyIo")]
 pub fn capture() -> (Vec<u8>, Vec<u8>) {
+    match inner_capture() {
+        Ok(a) => a,
+        _ => ([].to_vec(), [].to_vec())
+    }
+}
+
+fn inner_capture() -> Result<(Vec<u8>, Vec<u8>), NokhwaError>{
     let index = CameraIndex::Index(0);
     let requested =
         RequestedFormat::new::<RgbFormat>(RequestedFormatType::AbsoluteHighestFrameRate);
-    let mut camera = Camera::new(index, requested).unwrap();
-    camera.open_stream().unwrap();
-    let frame = camera.frame().unwrap();
-    let decoded = frame.decode_image::<RgbFormat>().unwrap();
+    let mut camera = Camera::new(index, requested)?;
+    camera.open_stream()?;
+    let frame = camera.frame()?;
+    let decoded = frame.decode_image::<RgbFormat>()?;
     let mut bytes: Vec<u8> = Vec::new();
     decoded.write_to(&mut Cursor::new(&mut bytes), image::ImageOutputFormat::Jpeg(100)).unwrap();
-    (bytes, prepare_for_remote(decoded))
-}
-
-pub struct QuadGrey;
-
-impl ColorMap for QuadGrey {
-    type Color = Luma<u8>;
-
-    fn index_of(&self, color: &Self::Color) -> usize {
-        (color.0[0] / 63).into()
-    }
-
-    fn lookup(&self, index: usize) -> Option<Self::Color> {
-        match index {
-            0 => Some([11].into()),
-            1 =>Some([67].into()),
-            2 =>Some([136].into()),
-            3 => Some([249].into()),
-            _ => None
-        }
-    }
-
-    fn map_color(&self, color: &mut Self::Color) {
-        let new_color = 0xFF * self.index_of(color) as u8;
-        let luma = &mut color.0;
-        luma[0] = new_color;
-    }
+    Ok((bytes, prepare_for_remote(decoded)))
 }
 
 fn prepare_for_remote(mut img: ImageBuffer<image::Rgb<u8>, Vec<u8>>) -> Vec<u8> {
@@ -72,7 +53,6 @@ fn prepare_for_remote(mut img: ImageBuffer<image::Rgb<u8>, Vec<u8>>) -> Vec<u8> 
     let mut cropped = crop(&mut img, x, 0, h, h);
     let mut resized = resize(&mut *cropped, 100, 100, image::imageops::FilterType::Nearest);
     let mut gray = grayscale(&mut resized);
-    dither(&mut gray, &QuadGrey);
     gray.into_vec()
 }
 

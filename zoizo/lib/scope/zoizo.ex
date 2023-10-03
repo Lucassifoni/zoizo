@@ -14,7 +14,13 @@ defmodule Zoizo do
 
   def blur_diam_px_from_base_fl(_base_fl, _radius, _rd, _sensor_distance, _px_size), do: error()
 
-  def capture(), do: error()
+  def do_capture() do
+    case capture() do
+      {[], []} -> :error
+      a -> {:ok, a}
+    end
+  end
+  defp capture(), do: error()
 
   defp error, do: :erlang.nif_error(:nif_not_loaded)
 end

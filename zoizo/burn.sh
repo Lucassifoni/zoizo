@@ -2,10 +2,8 @@
 export MIX_TARGET=mqscope
 export MIX_ENV=dev
 cd ../zoizoui
-mix deps.get
 mix assets.deploy
 cd ../zoizo
-#mix clean
 mix deps.get
 mix firmware
 export NERVES_WIFI_SSID='Tomato'

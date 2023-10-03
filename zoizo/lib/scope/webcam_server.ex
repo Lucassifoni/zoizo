@@ -1,5 +1,7 @@
 defmodule Scope.WebcamServer do
   alias Phoenix.PubSub
+  alias Scope.PhysicalRemote.SerialRemote
+
   use GenServer
 
   def init(init_arg) do
@@ -20,9 +22,19 @@ defmodule Scope.WebcamServer do
   def handle_info(:do_capture, {_, p}) do
     pid = self()
     Task.start(fn () ->
-      {pic, _} = Zoizo.capture()
-      PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, pic})
-      Process.send(pid, {:capture_done, pic}, [])
+      case Zoizo.do_capture() do
+        :error ->
+          Process.send(pid, {:capture_done, nil}, [])
+          :ok
+        {:ok, {pic, tiny_pic_pixels}} ->
+          PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, pic})
+          case GenServer.whereis(SerialRemote) do
+            nil -> :ok
+            p -> Process.send(p, {:picture, tiny_pic_pixels}, [])
+          end
+          Process.send(pid, {:capture_done, pic}, [])
+          :ok
+      end
     end)
     {:noreply, {true, p}}
   end
