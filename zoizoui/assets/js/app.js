@@ -53,6 +53,18 @@ Hooks.FooButton = {
     }
 };
 
+Hooks.hackyhook = {
+    mounted() {
+        this.el.addEventListener('change', () => {
+            let v = this.el.value;
+            if (this.el.type === "checkbox") {
+                v = this.el.checked;
+            }
+            this.pushEvent('value_changed', {setting: this.el.dataset.setting, value: v});
+        });
+    }
+}
+
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks});
 liveSocket.connect()
 

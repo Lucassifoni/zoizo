@@ -3,10 +3,9 @@ defmodule Scope.WebcamServer do
   Server used to take the continuous small webcam frames.
   """
   use GenServer
-  defstruct capturing: false, last_pic: nil, running: false
-
   alias Phoenix.PubSub
   alias Scope.PhysicalRemote.SerialRemote
+  defstruct capturing: false, last_pic: nil, running: false
 
   @type t() :: __MODULE__
 
