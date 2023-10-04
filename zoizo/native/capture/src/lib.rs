@@ -10,7 +10,7 @@ use nokhwa::{
 };
 use rustler::ResourceArc;
 
-#[rustler::nif(schedule = "DirtyIo")]
+#[rustler::nif]
 pub fn capture() -> (Vec<u8>, Vec<u8>) {
     match inner_capture() {
         Ok(a) => a,

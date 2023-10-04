@@ -23,6 +23,7 @@ defmodule Scope.PhysicalRemote.SerialRemote do
   end
   def handle_info({:circuits_uart, _, _}, b), do: {:noreply, b}
   def handle_info({:picture, data}, {pid, :idle}) do
+    IO.inspect(data)
     erase_screen(pid)
     remapped = data |> Enum.map(&(trunc(&1 / 64))) |> Enum.chunk_every(4) |> Enum.map(fn [a,b,c,d] ->
       <<a::2, b::2, c::2, d::2>>
