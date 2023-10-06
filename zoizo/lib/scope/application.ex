@@ -55,7 +55,7 @@ defmodule Scope.Application do
         passphrase = kv["wifi_passphrase"]
 
         unless empty?(ssid) do
-          _ = VintageNetWiFi.quick_configure(ssid, passphrase)
+          #_ = VintageNetWiFi.quick_configure(ssid, passphrase)
           :ok
         end
       end

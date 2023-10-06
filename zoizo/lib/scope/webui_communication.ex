@@ -14,6 +14,11 @@ defmodule Scope.WebuiCommunication do
     {:noreply, state}
   end
 
+  def handle_info({:setting, setting, value}, state) do
+    GenServer.cast(Scope.WebcamServer, {:setting, setting, value})
+    {:noreply, state}
+  end
+
   def handle_info(a, state) do
     InputHandler.handle(a)
     {:noreply, state}

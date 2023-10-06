@@ -3,8 +3,14 @@ defmodule Scope.Capture do
 
   use Rustler, otp_app: :scope, crate: "capture", target: System.get_env("RUSTLER_TARGET")
 
-  def do_capture() do
-    case System.cmd("fswebcam", ["--device", "/dev/video0", "-"]) do
+  def settings_to_args(settings) do
+    Enum.flat_map(settings, fn {key, value} ->
+      ["--set", "#{key}=#{value}"]
+    end)
+  end
+
+  def do_capture(settings \\ %{}) do
+    case System.cmd("fswebcam", ["--device", "/dev/video0", "-r", "352x288"] ++ settings_to_args(settings) ++ ["-"]) do
       {bytes, 0} -> case capture(bytes) do
         {[], []} -> :error
         a -> {:ok, a}

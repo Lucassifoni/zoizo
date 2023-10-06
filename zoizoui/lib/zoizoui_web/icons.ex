@@ -2,7 +2,7 @@ defmodule ZoizouiWeb.Icons do
   use Phoenix.Component
 
   attr :icon, :string, required: true
-  def icon(%{icon: i} = assigns) when i in ~w(CROIX
+  def zicon(%{icon: i} = assigns) when i in ~w(CROIX
   FLECHE-BAS
   FLECHE-DROITE
   FLECHE-GAUCHE

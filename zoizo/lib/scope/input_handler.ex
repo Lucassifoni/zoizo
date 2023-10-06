@@ -29,10 +29,6 @@ defmodule Scope.InputHandler do
 
   end
 
-  def handle(:replug) do
-
-  end
-
   def handle(_) do
     :ok
   end

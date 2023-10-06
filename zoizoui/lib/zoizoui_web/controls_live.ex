@@ -3,7 +3,7 @@ defmodule ZoizouiWeb.ControlsLive do
 
   alias Phoenix.PubSub
   # In Phoenix apps, the line is typically: use MyAppWeb, :live_view
-  use Phoenix.LiveView
+  use ZoizouiWeb, :live_view
   alias Phoenix.LiveView.JS
 
   def render(assigns) do
@@ -12,25 +12,24 @@ defmodule ZoizouiWeb.ControlsLive do
     ~H"""
     <div class="fixed inset-0 bg-slate-200">
     <canvas id="canvas" class="w-full h-auto bg-slate-700 mb-2"></canvas>
-    <div class="absolute bottom-0 left-0 right-0 top-48">
+    <div class="relative h-80 pb-8">
       <%= if @state.state == :idle do %>
         <div class="w-36 h-36 absolute left-[50%] -translate-x-[50%] mx-auto top-[.25em]">
-          <button class="absolute p-1 m-0 bottom-0 left-12 w-12 h-12" phx-hook="FooButton" id="down" data-buttonid="down"><.icon icon="FLECHE-BAS" /></button>
-          <button class="absolute p-1 m-0 right-0 top-12 w-12 h-12" phx-hook="FooButton" id="right" data-buttonid="right"><.icon icon="FLECHE-DROITE" /></button>
-          <button class="absolute p-1 m-0 left-0 top-12 w-12 h-12" phx-hook="FooButton" id="left" data-buttonid="left"><.icon icon="FLECHE-GAUCHE" /></button>
-          <button class="absolute p-1 m-0 left-12 w-12 h-12" phx-hook="FooButton" id="up" data-buttonid="up"><.icon icon="FLECHE-HAUT" /></button>
-          <button class="absolute p-1 m-0 top-12 left-12 w-12 h-12" phx-click="capture"><.icon icon="PHOTO" /></button>
+          <button class="absolute p-1 m-0 bottom-0 left-12 w-12 h-12" phx-hook="FooButton" id="down" data-buttonid="down"><.zicon icon="FLECHE-BAS" /></button>
+          <button class="absolute p-1 m-0 right-0 top-12 w-12 h-12" phx-hook="FooButton" id="right" data-buttonid="right"><.zicon icon="FLECHE-DROITE" /></button>
+          <button class="absolute p-1 m-0 left-0 top-12 w-12 h-12" phx-hook="FooButton" id="left" data-buttonid="left"><.zicon icon="FLECHE-GAUCHE" /></button>
+          <button class="absolute p-1 m-0 left-12 w-12 h-12" phx-hook="FooButton" id="up" data-buttonid="up"><.zicon icon="FLECHE-HAUT" /></button>
+          <button class="absolute p-1 m-0 top-12 left-12 w-12 h-12" phx-click="capture"><.zicon icon="PHOTO" /></button>
         </div>
         <div class="w-80 h-16 absolute left-[50%] -translate-x-[50%] mx-auto top-60">
           <span class="text-xs absolute -top-1 left-[50%] -translate-x-[50%]">FOCUS</span>
           <div class="h-[1px] border-dotted border-t-[1px] border-t-black left-2 right-2 absolute top-8"></div>
-          <button class="absolute top-3" phx-hook="FooButton" id="fin" data-buttonid="fin"><.icon icon="FOCUS-MOINS" /></button>
-          <button class="absolute top-3 left-[50%] -translate-x-[50%]" phx-click="autofocus"><.icon icon="FOCUS-AF" /></button>
-          <button class="absolute top-3 right-0" phx-hook="FooButton" id="fout" data-buttonid="fout"><.icon icon="FOCUS-PLUS" /></button>
+          <button class="absolute top-3" phx-hook="FooButton" id="fin" data-buttonid="fin"><.zicon icon="FOCUS-MOINS" /></button>
+          <button class="absolute top-3 left-[50%] -translate-x-[50%]" phx-click="autofocus"><.zicon icon="FOCUS-AF" /></button>
+          <button class="absolute top-3 right-0" phx-hook="FooButton" id="fout" data-buttonid="fout"><.zicon icon="FOCUS-PLUS" /></button>
         </div>
-          <div class="absolute top-14 right-2"><button phx-click="replug"><.icon icon="PRISES" /></button></div>
-          <div class="absolute top-2 right-2"><button phx-click="go_to_pictures"><.icon icon="PHOTOTHEQUE" /></button></div>
-          <div  class="absolute top-2 left-2"><button phx-click="go_to_settings"><.icon icon="REGLAGES" /></button></div>
+          <div class="absolute top-2 right-2"><button phx-click="go_to_pictures"><.zicon icon="PHOTOTHEQUE" /></button></div>
+          <div  class="absolute top-2 left-2"><button phx-click="go_to_settings"><.zicon icon="REGLAGES" /></button></div>
       <% end %>
 
       <%= if @state.state == :settings do %>
@@ -65,7 +64,7 @@ defmodule ZoizouiWeb.ControlsLive do
       <% end %>
 
     <%= if @state.state != :idle do %>
-      <div class="absolute top-2 left-2"><button phx-click="go_to_idle"><.icon icon="CROIX" /></button></div>
+      <div class="absolute top-2 left-2"><button phx-click="go_to_idle"><.zicon icon="CROIX" /></button></div>
     <% end %>
     </div>
     </div>
@@ -74,7 +73,8 @@ defmodule ZoizouiWeb.ControlsLive do
 
   def default_state() do
     %__MODULE__{
-      settings: Zoizoui.Webcam.settings()
+      settings: Zoizoui.Webcam.settings(),
+      state: :idle
     }
   end
 

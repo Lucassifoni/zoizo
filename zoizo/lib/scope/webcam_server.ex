@@ -5,7 +5,7 @@ defmodule Scope.WebcamServer do
   use GenServer
   alias Phoenix.PubSub
   alias Scope.PhysicalRemote.SerialRemote
-  defstruct capturing: false, last_pic: nil, running: false
+  defstruct capturing: false, last_pic: nil, running: false, settings: %{}
 
   @type t() :: __MODULE__
 
@@ -14,12 +14,12 @@ defmodule Scope.WebcamServer do
     {:ok, init_arg}
   end
 
-  @impl true
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, %__MODULE__{
       capturing: false,
       last_pic: nil,
       running: true,
+      settings: %{},
     }, name: __MODULE__)
     Process.send_after(pid, :capture, 16)
     {:ok, pid}
@@ -32,14 +32,19 @@ defmodule Scope.WebcamServer do
   @spec set_new_pic(t(), binary()) :: t()
   def set_new_pic(%__MODULE__{} = state, pic), do: Map.put(state, :last_pic, pic)
   @spec pic(t()) :: t()
-  def pic(%__MODULE__{} = state), do: Map.get(:state, pic)
+  def pic(%__MODULE__{} = state), do: Map.get(state, :last_pic)
   @spec running(t()) :: t()
-  def running(%__MODULE__{} = state), do: Map.put(:state, :running, true)
+  def running(%__MODULE__{} = state), do: Map.put(state, :running, true)
   @spec not_running(t()) :: t()
-  def not_running(%__MODULE__{} = state), do: Map.put(:state, :running, false)
+  def not_running(%__MODULE__{} = state), do: Map.put(state, :running, false)
+  def apply_setting(%__MODULE__{} = state, setting, value) do
+    settings = state.settings |> Map.put(setting, value)
+    Map.put(state, :settings, settings)
+  end
+  def clear_settings(%__MODULE__{} = state), do: Map.put(state, :settings, %{})
 
-  @spec broadcast_tiny_pic(pid(), binary()) :: :ok | :noconnect | :nosuspend
-  def broadcast_tiny_pic(pid, tiny_pic_pixels) do
+  @spec broadcast_pics(pid(), binary(), binary()) :: :ok | :noconnect | :nosuspend
+  def broadcast_pics(pid, pic, tiny_pic_pixels) do
     PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, pic})
     case GenServer.whereis(SerialRemote) do
       nil -> :ok
@@ -58,16 +63,16 @@ defmodule Scope.WebcamServer do
   def handle_info(:do_capture, %__MODULE__{} = state) do
     pid = self()
     Task.start(fn () ->
-      case Scope.Capture.do_capture() do
+      case Scope.Capture.do_capture(state.settings) do
         :error ->
           Process.send(pid, {:capture_done, nil}, [])
           :ok
         {:ok, {pic, tiny_pic_pixels}} ->
-          broadcast_tiny_pic(pid, tiny_pic_pixels)
+          broadcast_pics(pid, pic, tiny_pic_pixels)
           :ok
       end
     end)
-    {:noreply, state |> capturing}
+    {:noreply, state |> capturing |> clear_settings}
   end
 
   def handle_info(:capture, %__MODULE__{capturing: true} = state) do
@@ -88,17 +93,21 @@ defmodule Scope.WebcamServer do
 
   @impl true
   def handle_call(:pic, _from, %__MODULE__{} = state) do
-    {:reply, pic(pic), state}
+    {:reply, pic(state), state}
   end
 
   @impl true
-  def handle_cast(:play, _, %__MODULE__{} = state) do
+  def handle_cast(:play, %__MODULE__{} = state) do
     Process.send(self(), :capture, [])
     {:noreply, state |> running}
   end
 
+  def handle_cast({:setting, setting, value}, %__MODULE__{} = state) do
+    {:noreply, state |> apply_setting(setting, value)}
+  end
+
   @impl true
-  def handle_cast(:pause, _, %__MODULE__{} = state) do
+  def handle_cast(:pause, %__MODULE__{} = state) do
     {:noreply, state |> not_running}
   end
 

@@ -110,7 +110,7 @@ defmodule Zoizoui.Webcam do
         ],
       },
       exposure_time_absolute: %{
-        label: "Backlight compensation",
+        label: "Eposure time",
         type: :number,
         min: 1,
         max: 5000,
