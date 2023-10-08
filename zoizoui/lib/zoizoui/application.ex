@@ -15,7 +15,7 @@ defmodule Zoizoui.Application do
       # Start Finch
       {Finch, name: Zoizoui.Finch},
       # Start the Endpoint (http/https)
-      ZoizouiWeb.Endpoint
+      ZoizouiWeb.Endpoint,
       # Start a worker by calling: Zoizoui.Worker.start_link(arg)
       # {Zoizoui.Worker, arg}
     ]

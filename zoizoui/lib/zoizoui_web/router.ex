@@ -18,6 +18,7 @@ defmodule ZoizouiWeb.Router do
     pipe_through :browser
 
     live "/", ControlsLive
+    get "/cam", CamController, :cam
   end
 
   # Other scopes may use custom stacks.

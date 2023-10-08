@@ -5,7 +5,7 @@ defmodule Scope.WebcamServer do
   use GenServer
   alias Phoenix.PubSub
   alias Scope.PhysicalRemote.SerialRemote
-  defstruct capturing: false, last_pic: nil, running: false, settings: %{}
+  defstruct converting: false, port: nil, settings: %{}, buffer: []
 
   @type t() :: __MODULE__
 
@@ -16,107 +16,80 @@ defmodule Scope.WebcamServer do
 
   def start_link(_) do
     {:ok, pid} = GenServer.start_link(__MODULE__, %__MODULE__{
-      capturing: false,
-      last_pic: nil,
-      running: true,
+      port: nil,
+      converting: false,
+      buffer: [],
       settings: %{},
     }, name: __MODULE__)
-    Process.send_after(pid, :capture, 16)
+    Process.send_after(pid, :open_port, 500)
     {:ok, pid}
   end
 
-  @spec not_capturing(t()) :: t()
-  def not_capturing(%__MODULE__{} = state), do: Map.put(state, :capturing, false)
-  @spec capturing(t()) :: t()
-  def capturing(%__MODULE__{} = state), do: Map.put(state, :capturing, true)
-  @spec set_new_pic(t(), binary()) :: t()
-  def set_new_pic(%__MODULE__{} = state, pic), do: Map.put(state, :last_pic, pic)
-  @spec pic(t()) :: t()
-  def pic(%__MODULE__{} = state), do: Map.get(state, :last_pic)
-  @spec running(t()) :: t()
-  def running(%__MODULE__{} = state), do: Map.put(state, :running, true)
-  @spec not_running(t()) :: t()
-  def not_running(%__MODULE__{} = state), do: Map.put(state, :running, false)
+  def not_converting(%__MODULE__{} = state), do: Map.put(state, :converting, false)
+  def converting(%__MODULE__{} = state), do: Map.put(state, :converting, true)
+
   def apply_setting(%__MODULE__{} = state, setting, value) do
     settings = state.settings |> Map.put(setting, value)
     Map.put(state, :settings, settings)
   end
   def clear_settings(%__MODULE__{} = state), do: Map.put(state, :settings, %{})
 
-  @spec broadcast_pics(pid(), binary(), binary()) :: :ok | :noconnect | :nosuspend
-  def broadcast_pics(pid, pic, tiny_pic_pixels) do
-    PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, pic})
+  def broadcast_pics(pid, tiny_pic_pixels) do
     case GenServer.whereis(SerialRemote) do
       nil -> :ok
       p -> Process.send(p, {:picture, tiny_pic_pixels}, [])
     end
-    Process.send(pid, {:capture_done, pic}, [])
+    Process.send(pid, :conversion_done, [])
   end
 
-  @impl true
-  def handle_info({:capture_done, new_pic}, %__MODULE__{} = state) do
-    Process.send_after(self(), :capture, 16)
-    {:noreply, state |> not_capturing |> set_new_pic(new_pic) }
+  def handle_info(:open_port, state) do
+    args = ~w(-f v4l2 -video_size 320x240 -i /dev/video0 -r 25 -f mjpeg -)
+    port = Port.open({:spawn_executable, "/usr/bin/ffmpeg"}, [:binary, args: args])
+    {:noreply, Map.put(state, :port, port)}
   end
-
-  def handle_info(:do_capture, %__MODULE__{running: false} = state), do: {:noreply, state}
-  def handle_info(:do_capture, %__MODULE__{} = state) do
-    pid = self()
-    Task.start(fn () ->
-      case Scope.Capture.do_capture(state.settings) do
-        :error ->
-          Process.send(pid, {:capture_done, nil}, [])
-          :ok
-        {:ok, {pic, tiny_pic_pixels}} ->
-          broadcast_pics(pid, pic, tiny_pic_pixels)
-          :ok
-      end
-    end)
-    {:noreply, state |> capturing |> clear_settings}
-  end
-
-  def handle_info(:capture, %__MODULE__{capturing: true} = state) do
-    if state.running do
-      Process.send_after(self(), :capture, 16)
-    end
-    {:noreply, state}
-  end
-
-  def handle_info(:capture, %__MODULE__{capturing: false} = state) do
-    if state.running do
-      Process.send(self(), :do_capture, [])
-      {:noreply, state |> capturing}
+  def handle_info({:convert, data}, state) do
+    if not(state.converting) do
+      pid = self()
+      Task.start(fn () ->
+        case Scope.Converter.do_convert(data) do
+          :error ->
+            Process.send(pid, :conversion_done, [])
+            :ok
+          {:ok, tiny_pic_pixels} ->
+            broadcast_pics(pid, tiny_pic_pixels)
+            :ok
+        end
+      end)
+      {:noreply, state |> converting}
     else
       {:noreply, state}
     end
   end
 
-  @impl true
-  def handle_call(:pic, _from, %__MODULE__{} = state) do
-    {:reply, pic(state), state}
+  def parse_jpeg(<<0xFF, 0xD9>>, acc) do
+   (<<255::8, 216::8, 255::8>> <> Enum.into(Enum.reverse(acc), <<>>, fn byte -> <<byte :: 8>> end) <> <<0xFF::8, 0xD9::8>>)
+
+  end
+  def parse_jpeg(<<byte::8>> <> rest, acc), do: parse_jpeg(rest, [byte | acc])
+  def handle_info({port, {:data, data}}, %__MODULE__{port: port} = state) do
+    case data do
+      <<255, 216, 255>> <> d -> out = parse_jpeg(d, [])
+      pid = self()
+      Task.start(fn () ->
+        Process.send(pid, {:convert, out}, [])
+        PubSub.broadcast(Zoizoui.PubSub, "frames", {:got_pic, Base.encode64(out, padding: false)})
+      end)
+      _ -> :ok
+    end
+    {:noreply, state}
   end
 
   @impl true
-  def handle_cast(:play, %__MODULE__{} = state) do
-    Process.send(self(), :capture, [])
-    {:noreply, state |> running}
+  def handle_info(:conversion_done, %__MODULE__{} = state) do
+    {:noreply, state |> not_converting }
   end
 
   def handle_cast({:setting, setting, value}, %__MODULE__{} = state) do
     {:noreply, state |> apply_setting(setting, value)}
   end
-
-  @impl true
-  def handle_cast(:pause, %__MODULE__{} = state) do
-    {:noreply, state |> not_running}
-  end
-
-  @spec get_pic() :: binary()
-  def get_pic(), do: GenServer.call(Scope.WebcamServer, :pic)
-
-  @spec play() :: :ok
-  def play(), do: GenServer.cast(Scope.WebcamServer, :play)
-
-  @spec pause() :: :ok
-  def pause(), do: GenServer.cast(Scope.WebcamServer, :pause)
 end

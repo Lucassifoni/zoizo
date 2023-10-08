@@ -15,18 +15,18 @@ defmodule ZoizouiWeb.ControlsLive do
     <div class="relative h-80 pb-8">
       <%= if @state.state == :idle do %>
         <div class="w-36 h-36 absolute left-[50%] -translate-x-[50%] mx-auto top-[.25em]">
-          <button class="absolute p-1 m-0 bottom-0 left-12 w-12 h-12" phx-hook="FooButton" id="down" data-buttonid="down"><.zicon icon="FLECHE-BAS" /></button>
-          <button class="absolute p-1 m-0 right-0 top-12 w-12 h-12" phx-hook="FooButton" id="right" data-buttonid="right"><.zicon icon="FLECHE-DROITE" /></button>
-          <button class="absolute p-1 m-0 left-0 top-12 w-12 h-12" phx-hook="FooButton" id="left" data-buttonid="left"><.zicon icon="FLECHE-GAUCHE" /></button>
-          <button class="absolute p-1 m-0 left-12 w-12 h-12" phx-hook="FooButton" id="up" data-buttonid="up"><.zicon icon="FLECHE-HAUT" /></button>
+          <button class="absolute p-1 m-0 bottom-0 left-12 w-12 h-12" phx-hook="ButtonsHook" id="down" data-buttonid="down"><.zicon icon="FLECHE-BAS" /></button>
+          <button class="absolute p-1 m-0 right-0 top-12 w-12 h-12" phx-hook="ButtonsHook" id="right" data-buttonid="right"><.zicon icon="FLECHE-DROITE" /></button>
+          <button class="absolute p-1 m-0 left-0 top-12 w-12 h-12" phx-hook="ButtonsHook" id="left" data-buttonid="left"><.zicon icon="FLECHE-GAUCHE" /></button>
+          <button class="absolute p-1 m-0 left-12 w-12 h-12" phx-hook="ButtonsHook" id="up" data-buttonid="up"><.zicon icon="FLECHE-HAUT" /></button>
           <button class="absolute p-1 m-0 top-12 left-12 w-12 h-12" phx-click="capture"><.zicon icon="PHOTO" /></button>
         </div>
         <div class="w-80 h-16 absolute left-[50%] -translate-x-[50%] mx-auto top-60">
           <span class="text-xs absolute -top-1 left-[50%] -translate-x-[50%]">FOCUS</span>
           <div class="h-[1px] border-dotted border-t-[1px] border-t-black left-2 right-2 absolute top-8"></div>
-          <button class="absolute top-3" phx-hook="FooButton" id="fin" data-buttonid="fin"><.zicon icon="FOCUS-MOINS" /></button>
+          <button class="absolute top-3" phx-hook="ButtonsHook" id="fin" data-buttonid="fin"><.zicon icon="FOCUS-MOINS" /></button>
           <button class="absolute top-3 left-[50%] -translate-x-[50%]" phx-click="autofocus"><.zicon icon="FOCUS-AF" /></button>
-          <button class="absolute top-3 right-0" phx-hook="FooButton" id="fout" data-buttonid="fout"><.zicon icon="FOCUS-PLUS" /></button>
+          <button class="absolute top-3 right-0" phx-hook="ButtonsHook" id="fout" data-buttonid="fout"><.zicon icon="FOCUS-PLUS" /></button>
         </div>
           <div class="absolute top-2 right-2"><button phx-click="go_to_pictures"><.zicon icon="PHOTOTHEQUE" /></button></div>
           <div  class="absolute top-2 left-2"><button phx-click="go_to_settings"><.zicon icon="REGLAGES" /></button></div>
@@ -42,15 +42,15 @@ defmodule ZoizouiWeb.ControlsLive do
               <div class="relative">
                 <span class="absolute text-xs left-0"><%= meta.min %></span>
                 <span class="absolute text-xs right-0"><%= meta.max %></span>
-                <input phx-hook="hackyhook" data-setting={setting} id={setting} min={meta.min} max={meta.max} value={meta.value} step={meta.step} class="relative top-[.75em] text-sm w-full" type="range">
+                <input phx-hook="SettingsHook" data-setting={setting} id={setting} min={meta.min} max={meta.max} value={meta.value} step={meta.step} class="relative top-[.75em] text-sm w-full" type="range">
               </div>
             <% :boolean -> %>
-              <input phx-hook="hackyhook" data-setting={setting} type="checkbox" id={setting} checked={meta.value}>
+              <input phx-hook="SettingsHook" data-setting={setting} type="checkbox" id={setting} checked={meta.value}>
             <% :menu -> %>
               <div class="flex">
               <%= for {key, val} <- meta.values do %>
                 <label class="block text-xs pl-2 mr-2">
-                <input phx-hook="hackyhook" data-setting={setting} type="radio" class="mr-1" id={"#{setting}-#{key}"} name={"input-#{setting}"} value={key} checked={key == meta.value}>
+                <input phx-hook="SettingsHook" data-setting={setting} type="radio" class="mr-1" id={"#{setting}-#{key}"} name={"input-#{setting}"} value={key} checked={key == meta.value}>
                 <%= val %>
                 </label>
               <% end %>

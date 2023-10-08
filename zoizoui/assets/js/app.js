@@ -34,7 +34,7 @@ window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
 let Hooks = {};
 
-Hooks.FooButton = {
+Hooks.ButtonsHook = {
     mounted() {
         this.el.addEventListener('mousedown', () => {
             this.pushEvent(this.el.dataset.buttonid + '_pressed');
@@ -53,7 +53,7 @@ Hooks.FooButton = {
     }
 };
 
-Hooks.hackyhook = {
+Hooks.SettingsHook = {
     mounted() {
         this.el.addEventListener('change', () => {
             let v = this.el.value;
@@ -88,7 +88,7 @@ function draw2(imgData) {
 
     var base64 = window.btoa(data);
     var img = new Image();
-    img.src = "data:image/jpeg;base64," + base64;
+    img.src = "data:image/jpeg;base64," + imgData;
     img.onload = function () {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;

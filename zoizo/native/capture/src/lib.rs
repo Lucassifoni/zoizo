@@ -11,10 +11,10 @@ use std::process::Stdio;
 
 
 #[rustler::nif]
-pub fn capture(img: rustler::Binary) -> (Vec<u8>, Vec<u8>) {
-    match inner_capture(img.to_vec()) {
+pub fn convert(img: rustler::Binary) -> Vec<u8> {
+    match inner_convert(img.to_vec()) {
         Ok(a) => a,
-        _ => ([].to_vec(), [].to_vec()),
+        _ => [].to_vec(),
     }
 }
 
@@ -32,9 +32,9 @@ impl From<ImageError> for CaptureError {
 }
 
 
-fn inner_capture(img: Vec<u8>) -> Result<(Vec<u8>, Vec<u8>), CaptureError> {
+fn inner_convert(img: Vec<u8>) -> Result<Vec<u8>, CaptureError> {
     let mut image = load_from_memory(&img).unwrap();
-    Ok((img, prepare_for_remote(image.to_rgb8())))
+    Ok(prepare_for_remote(image.to_rgb8()))
 }
 
 fn prepare_for_remote(mut img: ImageBuffer<image::Rgb<u8>, Vec<u8>>) -> Vec<u8> {
@@ -57,4 +57,4 @@ fn load(env: rustler::Env, _info: rustler::Term) -> bool {
     true
 }
 
-rustler::init!("Elixir.Scope.Capture", [capture], load = load);
+rustler::init!("Elixir.Scope.Converter", [convert], load = load);
